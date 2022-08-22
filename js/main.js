@@ -1,10 +1,49 @@
 const gameContainer = document.querySelector('#game-container')
 const widthGameContainer = gameContainer.offsetWidth
-let lengthOfSquare = 100
+let lengthOfSquare = 33
+
 
 const btnChangeSize = document.querySelector('#changeSize')
+const select = document.querySelector('#select')
+
 
 btnChangeSize.addEventListener('click', changeFieldSize)
+
+function random_rgba() {
+    var o = Math.round,
+        r = Math.random,
+        s = 255;
+    return 'rgba(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ')';
+}
+
+const changeColorRandom = function() {
+    this.style.backgroundColor = `${random_rgba()}`
+    console.log(this.style.backgroundColor = `${random_rgba()}`);
+}
+
+const changeColorDarker = function() {
+    let opacity = parseFloat(this.style.backgroundColor.slice(-4, -1))
+    if (!opacity) {
+        this.style.backgroundColor = 'rgba(0,0,0,0.1)'
+        opacity = parseFloat(this.style.backgroundColor.slice(-4, -1))
+    }
+    if (opacity !== 0.9) {
+        opacity += +0.1
+        this.style.backgroundColor = `rgba(0,0,0,${opacity})`
+    }
+
+}
+
+let colorMode = changeColorRandom
+
+
+select.addEventListener('change', () => {
+    if (select.selectedOptions[0].innerText === 'mode Random') { colorMode = changeColorRandom }
+    if (select.selectedOptions[0].innerText === 'mode Darker') { colorMode = changeColorDarker }
+    console.log(select.selectedOptions[0].innerText);
+    createField(colorMode)
+
+})
 
 function createColorContainer() {
     const widthPart = widthGameContainer / lengthOfSquare
@@ -16,12 +55,6 @@ function createColorContainer() {
     return block
 }
 
-function random_rgba() {
-    var o = Math.round,
-        r = Math.random,
-        s = 255;
-    return 'rgba(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ')';
-}
 
 function changeFieldSize(e) {
     let newLength = window.prompt('How many squares per side? Max:100', '')
@@ -30,32 +63,24 @@ function changeFieldSize(e) {
         newLength = window.prompt('Put Only Number! How many squares per side? Max:100')
     }
     lengthOfSquare = newLength
-    createField()
-}
-
-function changeColorBlock(item) {
-    item.addEventListener('mouseover', () => {
-        item.style.backgroundColor = `${random_rgba()}`
-        console.log(item.style.backgroundColor = `${random_rgba()}`);
-    })
+    createField(colorMode)
 }
 
 
-var color = random_rgba();
-
-function createField() {
+function createField(color) {
     gameContainer.innerHTML = '';
-
     for (let i = 0; i < lengthOfSquare; i++) {
         const row = document.createElement('div')
         row.classList.add('row')
         for (let y = 0; y < lengthOfSquare; y++) {
             const colorContainer = createColorContainer()
-            changeColorBlock(colorContainer)
             row.append(colorContainer)
+            colorContainer.addEventListener('mouseover', color)
         }
         gameContainer.append(row)
 
     }
 }
-createField()
+createField(colorMode)
+
+console.log(document);
